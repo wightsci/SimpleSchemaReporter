@@ -16,7 +16,7 @@ An option is available to immediately view the report(s) generated using the Vie
 
 Example:
 
-```Powershell
+```powershell
 SimpleSchemaReporter.ps1 -ClassName User -ReportType HTMLFile -ViewOutput
 ```
 
