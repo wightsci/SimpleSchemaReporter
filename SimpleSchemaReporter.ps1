@@ -45,6 +45,34 @@ If a ReportName parameter is provided then the schema class name is appended.
 Specifies whether the report is displayed using the default application
 for its file type. The default value is False.
 
+.EXAMPLE
+    SimpleSchemaReporter.ps1
+
+Runs SimpleSchemaReporter with all defaults. An HTML report is generated for the User class
+with a system generated name.
+
+.EXAMPLE
+    SimpleSchemaReporter.ps1 -ClassName Computer
+
+An HTML report is generated for the Computer class with a system generated name.
+
+.EXAMPLE
+    SimpleSchemaReporter.ps1 -ClassName Computer -ViewOutput
+
+An HTML report is generated for the Computer class with a system generated name, the report
+is displayed in the user's default HTML viewer.
+
+.EXAMPLE
+    SimpleSchemaReporter.ps1 -ClassName Computer,User,Contact -ReportType HTML,CSV
+
+An HTML report and a CSV report is generated for the Computer, User and Contact classes with system generated names.
+
+
+
+.INPUTS
+
+None. You cannot pipe objects to SimpleSchemaReporter.ps1
+
 #>
 Param (
     [Parameter(Mandatory=$False)]
