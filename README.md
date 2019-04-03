@@ -14,6 +14,8 @@ Reports are available as HTML, XML or CSV files or can be output directly onto t
 
 An option is available to immediately view the report(s) generated using the ViewOutput parameter.
 
+![Screenshot of HTML report](SimpleSchemaReporter.png)
+
 The HTMLFile output contains a JavaScript function to sort the results of the table by any column heading.
 Please be aware the the performance of the sorting script is poor, so please bear with it whilst it sorts.
 Many of the schema entries have ~400 properties!
