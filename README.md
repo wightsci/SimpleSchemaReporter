@@ -14,6 +14,9 @@ Reports are available as HTML, XML or CSV files or can be output directly onto t
 
 An option is available to immediately view the report(s) generated using the ViewOutput parameter.
 
+*New in June 2019* - added the capability to report the list of available classes in Active Directory. Use
+the ``-ListClasses`` parameter.
+
 Example:
 
 ```powershell
