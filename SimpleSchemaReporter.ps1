@@ -107,64 +107,104 @@ Param (
 <#
 Tested on Windows 10/Server 2019
 #>
+$stylesheet = @"
+<style>
+body {
+    font-family: Calibri, Segoe, Arial, Sans-Serif;
+    font-size: 9pt;
+}
+table {
+    border-collapse: collapse;
+    border-color: RoyalBlue;
+    border-style: solid;
+    width: 100%;
+}
+th, td {
+    text-align: left;
+    padding: 0.5em;
+    border-collapse: collapse;
+    border-color: RoyalBlue;
+    border-style: solid;
+    border-width: 1pt;
+    width: 100%;
+}
+th {
+    background-color: SteelBlue;
+    color: White;
+    cursor: pointer;
+}
+tr:nth-child(odd) {
+    background-color: CornflowerBlue;
+}
+h1 {
+    color: SteelBlue;
+}
+.reportfooter {
+    font-size: 8pt;
+    color: SteelBlue;
+}
+</style>
+"@
 
 #W3Schools Sort Function
 $htmlScript = @"
 //<![CDATA[
-function sortTable(n) {
-var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-table = document.getElementsByTagName("table")[0];
-switching = true;
-// Set the sorting direction to ascending:
-dir = "asc"; 
-/* Make a loop that will continue until
-no switching has been done: */
-while (switching) {
-// Start by saying: no switching is done:
-switching = false;
-rows = table.rows;
-/* Loop through all table rows (except the
-first, which contains table headers): */
-for (i = 1; i < (rows.length - 1); i++) {
-  // Start by saying there should be no switching:
-  shouldSwitch = false;
-  /* Get the two elements you want to compare,
-  one from current row and one from the next: */
-  x = rows[i].getElementsByTagName("TD")[n];
-  y = rows[i + 1].getElementsByTagName("TD")[n];
-  /* Check if the two rows should switch place,
-  based on the direction, asc or desc: */
-  if (dir == "asc") {
-    if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-      // If so, mark as a switch and break the loop:
-      shouldSwitch = true;
-      break;
+    function sortTable(n) {
+        document.body.style.cursor = 'progress';
+        var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+        table = document.getElementsByTagName("table")[0];
+        switching = true;
+        // Set the sorting direction to ascending:
+        dir = "asc"; 
+        /* Make a loop that will continue until
+        no switching has been done: */
+        while (switching) {
+            // Start by saying: no switching is done:
+            switching = false;
+            rows = table.rows;
+            /* Loop through all table rows (except the
+            first, which contains table headers): */
+            for (i = 1; i < (rows.length - 1); i++) {
+                // Start by saying there should be no switching:
+                shouldSwitch = false;
+                /* Get the two elements you want to compare,
+                one from current row and one from the next: */
+                x = rows[i].getElementsByTagName("TD")[n];
+                y = rows[i + 1].getElementsByTagName("TD")[n];
+                /* Check if the two rows should switch place,
+                based on the direction, asc or desc: */
+                if (dir == "asc") {
+                    if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                        // If so, mark as a switch and break the loop:
+                        shouldSwitch = true;
+                        break;
+                    }
+                } else if (dir == "desc") {
+                    if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                        // If so, mark as a switch and break the loop:
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+            }
+            if (shouldSwitch) {
+                /* If a switch has been marked, make the switch
+                and mark that a switch has been done: */
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+                // Each time a switch is done, increase this count by 1:
+                switchcount ++; 
+            } else {
+                /* If no switching has been done AND the direction is "asc",
+                set the direction to "desc" and run the while loop again. */
+                if (switchcount == 0 && dir == "asc") {
+                    dir = "desc";
+                    switching = true;
+                }
+            }
+        }
+        document.body.style.cursor = 'default';
     }
-  } else if (dir == "desc") {
-    if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-      // If so, mark as a switch and break the loop:
-      shouldSwitch = true;
-      break;
-    }
-  }
-}
-if (shouldSwitch) {
-  /* If a switch has been marked, make the switch
-  and mark that a switch has been done: */
-  rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-  switching = true;
-  // Each time a switch is done, increase this count by 1:
-  switchcount ++; 
-} else {
-  /* If no switching has been done AND the direction is "asc",
-  set the direction to "desc" and run the while loop again. */
-  if (switchcount == 0 && dir == "asc") {
-    dir = "desc";
-    switching = true;
-  }
-}
-}
-}
 //]]>
 "@ 
 
@@ -209,6 +249,10 @@ filter selectattributes {
     $_ | Select-Object Name,CommonName,OID,Syntax,Mandatory,Constructed,IsSingleValued,IsInAnr,RangeLower,RangeUpper,Link,LinkId
 }
 
+filter selectclasses {
+    $_.FindAllClasses() | Select-Object Name,CommonName,subClassOf
+}
+
 function addjscript($html) {
     #Add a Javascript to allow table sorting
     $htmldata = [xml]($($html))
@@ -236,63 +280,31 @@ function generateclasslist($Type, $BaseName, $View, $schemaobject) {
     $htmlPost = @"
     <div class="reportfooter">Generated by Simple Schema Reporter.</div>
 "@
+
 $htmlHead = @"
 <title>Class Report</title>
-<style>
-body {
-font-family: Calibri, Segoe, Arial, Sans-Serif;
-font-size: 9pt;
-}
-table {
-border-collapse: collapse;
-border-color: RoyalBlue;
-border-style: solid;
-width: 100%;
-}
-th, td {
-text-align: left;
-padding: 0.5em;
-border-collapse: collapse;
-border-color: RoyalBlue;
-border-style: solid;
-border-width: 1pt;
-}
-th {
-background-color: SteelBlue;
-color: White;
-cursor: pointer;
-}
-tr:nth-child(odd) {
-background-color: CornflowerBlue;
-}
-h1 {
-color: SteelBlue;
-}
-.reportfooter {
-font-size: 8pt;
-color: SteelBlue;
-}
-</style>
+$stylesheet
 "@
+
 switch ($type) {
     'HTMLFile' {
         $outputfilename = "$($basename).html"
-        $outputdata = $schemaobject.FindAllClasses() | Select-Object Name,CommonName,subClassOf | Sort-Object -Property Name | ConvertTo-Html -Head $htmlHead -PreContent $htmlPre -PostContent $htmlPost
+        $outputdata = $schemaobject | selectclasses | Sort-Object -Property Name | ConvertTo-Html -Head $htmlHead -PreContent $htmlPre -PostContent $htmlPost
         $htmlpage = addjscript $outputdata
         Out-File -FilePath $outputfilename -InputObject $htmlpage.html.OuterXml
     }
     'HTMLClipboard' {
-        $outputdata = $schemaobject.FindAllClasses() | Select-Object Name,CommonName,subClassOf | Sort-Object -Property Name | ConvertTo-Html -Fragment -PreContent $htmlPre -PostContent $htmlPost
+        $outputdata = $schemaobject | selectclasses | Sort-Object -Property Name | ConvertTo-Html -Fragment -PreContent $htmlPre -PostContent $htmlPost
         Set-Clipboard -Value $outputdata
     }
     'XMLFile' {
         $outputfilename = "$($basename).xml"
-        $outputdata = $schemaobject.FindAllClasses() | Select-Object Name,CommonName,subClassOf | Sort-Object -Property Name | ConvertTo-XML -As String -NoTypeInformation
+        $outputdata = $schemaobject | selectclasses | Sort-Object -Property Name | ConvertTo-XML -As String -NoTypeInformation
         Out-File -FilePath $outputfilename -InputObject $outputdata
     }
     'CSVFile' {
         $outputfilename = "$($basename).csv"
-        $outputdata = $schemaobject.FindAllClasses() | Select-Object Name,CommonName,subClassOf | Sort-Object -Property Name
+        $outputdata = $schemaobject | selectclasses | Sort-Object -Property Name
         $outputdata | Export-CSV -NoTypeInformation -Path $outputfilename
     }
 }
@@ -307,44 +319,10 @@ $htmlPre = @"
         $htmlPost = @"
         <div class="reportfooter">Generated by Simple Schema Reporter.</div>
 "@
+
 $htmlHead = @"
 <title>Schema Report for $schemaToReport Class</title>
-<style>
-body {
-    font-family: Calibri, Segoe, Arial, Sans-Serif;
-    font-size: 9pt;
-}
-table {
-    border-collapse: collapse;
-    border-color: RoyalBlue;
-    border-style: solid;
-    width: 100%;
-}
-th, td {
-    text-align: left;
-    padding: 0.5em;
-    border-collapse: collapse;
-    border-color: RoyalBlue;
-    border-style: solid;
-    border-width: 1pt;
-    width: 100%;
-}
-th {
-    background-color: SteelBlue;
-    color: White;
-    cursor: pointer;
-}
-tr:nth-child(odd) {
-    background-color: CornflowerBlue;
-}
-h1 {
-    color: SteelBlue;
-}
-.reportfooter {
-    font-size: 8pt;
-    color: SteelBlue;
-}
-</style>
+$stylesheet
 "@
 switch ($type) {
     'HTMLFile' {
